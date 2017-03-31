@@ -1,4 +1,4 @@
-package com.udacity.stockhawk;
+package com.retroquack.kwak123;
 
 import android.app.Application;
 

@@ -1,4 +1,4 @@
-package com.udacity.stockhawk.ui;
+package com.retroquack.kwak123.ui;
 
 
 import android.content.Context;
@@ -9,9 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.udacity.stockhawk.R;
-import com.udacity.stockhawk.data.Contract;
-import com.udacity.stockhawk.data.PrefUtils;
+import com.retroquack.kwak123.R;
+import com.retroquack.kwak123.data.Contract;
+import com.retroquack.kwak123.data.PrefUtils;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;

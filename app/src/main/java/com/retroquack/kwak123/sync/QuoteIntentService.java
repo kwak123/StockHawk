@@ -1,4 +1,4 @@
-package com.udacity.stockhawk.sync;
+package com.retroquack.kwak123.sync;
 
 import android.app.IntentService;
 import android.content.Intent;

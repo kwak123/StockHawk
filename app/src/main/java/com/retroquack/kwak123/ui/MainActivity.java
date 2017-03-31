@@ -1,4 +1,4 @@
-package com.udacity.stockhawk.ui;
+package com.retroquack.kwak123.ui;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -19,10 +19,10 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.udacity.stockhawk.R;
-import com.udacity.stockhawk.data.Contract;
-import com.udacity.stockhawk.data.PrefUtils;
-import com.udacity.stockhawk.sync.QuoteSyncJob;
+import com.retroquack.kwak123.R;
+import com.retroquack.kwak123.data.Contract;
+import com.retroquack.kwak123.data.PrefUtils;
+import com.retroquack.kwak123.sync.QuoteSyncJob;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

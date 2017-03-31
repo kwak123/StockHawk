@@ -52,14 +52,28 @@ check {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
+
+    // Material Design
     compile 'com.android.support:appcompat-v7:25.1.0'
     compile 'com.android.support:recyclerview-v7:25.1.0'
     compile 'com.android.support:design:25.1.0'
+
+    // ButterKnife
     compile 'com.jakewharton:butterknife:8.4.0'
     apt 'com.jakewharton:butterknife-compiler:8.4.0'
+
+    // Guava
     compile 'com.google.guava:guava:20.0'
+
+    // Yahoo Finance
     compile 'com.yahoofinance-api:YahooFinanceAPI:3.5.0'
+
+    // Timber
     compile 'com.jakewharton.timber:timber:4.4.0'
+
+    // OpenCSV
     compile 'net.sf.opencsv:opencsv:2.3'
+
+    // AndroidChart
     compile 'com.github.PhilJay:MPAndroidChart:v3.0.1'
 }
