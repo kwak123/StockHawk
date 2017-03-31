@@ -15,12 +15,18 @@
         android:theme="@style/AppTheme"
         android:supportsRtl="true"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name="com.retroquack.kwak123.ui.MainActivity">
+
+        <activity android:name="com.retroquack.kwak123.ui.StocksMainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity android:name=".ui.StocksDetailActivity"
+            android:label="@string/detail_activity"
+            android:parentActivityName=".ui.StocksMainActivity">
         </activity>
 
         <service
