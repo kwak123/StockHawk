@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -28,12 +30,16 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import timber.log.Timber;
 
+import static android.support.design.widget.Snackbar.make;
+
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
         SwipeRefreshLayout.OnRefreshListener,
         StockAdapter.StockAdapterOnClickHandler {
 
     private static final int STOCK_LOADER = 0;
     @SuppressWarnings("WeakerAccess")
+    @BindView(R.id.coordinator_layout)
+    CoordinatorLayout coordinatorLayout;
     @BindView(R.id.recycler_view)
     RecyclerView stockRecyclerView;
     @SuppressWarnings("WeakerAccess")
@@ -43,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @BindView(R.id.error)
     TextView error;
     private StockAdapter adapter;
+    private Snackbar snackbar;
 
     @Override
     public void onClick(String symbol) {
@@ -62,6 +69,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.setRefreshing(true);
+        snackbar = Snackbar.make(coordinatorLayout,
+                getString(R.string.error_no_network),
+                Snackbar.LENGTH_INDEFINITE);
         onRefresh();
 
         QuoteSyncJob.initialize(this);
@@ -93,22 +103,26 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onRefresh() {
-
         QuoteSyncJob.syncImmediately(this);
 
-        if (!networkUp() && adapter.getItemCount() == 0) {
+        if (!networkUp()) {
             swipeRefreshLayout.setRefreshing(false);
-            error.setText(getString(R.string.error_no_network));
-            error.setVisibility(View.VISIBLE);
-        } else if (!networkUp()) {
-            swipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(this, R.string.toast_no_connectivity, Toast.LENGTH_LONG).show();
-        } else if (PrefUtils.getStocks(this).size() == 0) {
-            swipeRefreshLayout.setRefreshing(false);
-            error.setText(getString(R.string.error_no_stocks));
-            error.setVisibility(View.VISIBLE);
+            snackbar.show();
+
+            if(adapter.getItemCount() == 0) {
+                swipeRefreshLayout.setRefreshing(false);
+                error.setText(getString(R.string.error_no_network_no_stocks));
+                error.setVisibility(View.VISIBLE);
+            }
         } else {
-            error.setVisibility(View.GONE);
+            swipeRefreshLayout.setRefreshing(false);
+            snackbar.dismiss();
+
+            if (networkUp() && adapter.getItemCount() == 0) {
+
+                error.setText(getString(R.string.error_no_stocks));
+                error.setVisibility(View.VISIBLE);
+            }
         }
     }
 
