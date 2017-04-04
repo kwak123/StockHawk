@@ -1,6 +1,7 @@
 package com.retroquack.kwak123.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -51,6 +52,11 @@ public class StocksMainActivity extends AppCompatActivity implements LoaderManag
 
     @Override
     public void onClick(String symbol) {
+        // For symbol to show on list, it must be in database i.e. not null
+        Intent intent = new Intent(this, StocksDetailActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(StocksDetailActivity.KEY_STOCK_SYMBOL, symbol);
+        startActivity(intent);
         Timber.d("Symbol clicked: %s", symbol);
     }
 
@@ -70,6 +76,7 @@ public class StocksMainActivity extends AppCompatActivity implements LoaderManag
         snackbar = Snackbar.make(coordinatorLayout,
                 getString(R.string.error_no_network),
                 Snackbar.LENGTH_INDEFINITE);
+
         onRefresh();
 
         QuoteSyncJob.initialize(this);

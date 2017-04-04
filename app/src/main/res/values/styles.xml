@@ -16,8 +16,18 @@
         <item name="android:textSize">20sp</item>
     </style>
 
+    <style name="MarketTextStyle">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/text_white_70</item>
+    </style>
+
     <style name="StockSymbolTextStyle">
         <item name="android:textSize">24sp</item>
         <item name="android:textAllCaps">true</item>
     </style>
+
+    <style name="StockNameTextStyle">
+        <item name="android:textSize">24sp</item>
+    </style>
+
 </resources>
