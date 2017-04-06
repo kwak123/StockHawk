@@ -61,6 +61,22 @@ public final class PrefUtils {
         editStockPref(context, symbol, false);
     }
 
+    public static void setLastUpdate(Context context, String date) {
+        String dateKey = context.getString(R.string.pref_last_update_key);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(dateKey, date);
+        editor.apply();
+    }
+
+    public static String getLastUpdate(Context  context) {
+        String datekey = context.getString(R.string.pref_last_update_key);
+        String defaultValue = context.getString(R.string.pref_last_update_default);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getString(datekey, defaultValue);
+    }
+
     public static String getDisplayMode(Context context) {
         String key = context.getString(R.string.pref_display_mode_key);
         String defaultValue = context.getString(R.string.pref_display_mode_default);

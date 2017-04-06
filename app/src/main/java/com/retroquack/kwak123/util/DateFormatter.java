@@ -5,19 +5,11 @@ import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 
 import java.text.DateFormat;
 
-public final class DateFormatter implements IAxisValueFormatter {
+final class DateFormatter implements IAxisValueFormatter {
     private static DateFormat format;
-    private static DateFormatter dateFormatter;
 
-    private DateFormatter() {
+    DateFormatter() {
         format = DateFormat.getDateInstance(DateFormat.SHORT);
-    }
-
-    public static DateFormatter getInstance() {
-        if (dateFormatter == null) {
-            dateFormatter = new DateFormatter();
-        }
-        return dateFormatter;
     }
 
     @Override

@@ -15,6 +15,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,6 +37,8 @@ public class StocksMainActivity extends AppCompatActivity implements LoaderManag
         StockAdapter.StockAdapterOnClickHandler {
 
     private static final int STOCK_LOADER = 0;
+    @BindView(R.id.main_toolbar)
+    Toolbar toolbar;
     @SuppressWarnings("WeakerAccess")
     @BindView(R.id.coordinator_layout)
     CoordinatorLayout coordinatorLayout;
@@ -47,6 +50,7 @@ public class StocksMainActivity extends AppCompatActivity implements LoaderManag
     @SuppressWarnings("WeakerAccess")
     @BindView(R.id.error)
     TextView error;
+
     private StockAdapter adapter;
     private Snackbar snackbar;
 
@@ -67,9 +71,13 @@ public class StocksMainActivity extends AppCompatActivity implements LoaderManag
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        setSupportActionBar(toolbar);
+
+
         adapter = new StockAdapter(this, this);
         stockRecyclerView.setAdapter(adapter);
         stockRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        String lastUpdate = getString(R.string.updated_last) + PrefUtils.getLastUpdate(this);
 
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.setRefreshing(true);

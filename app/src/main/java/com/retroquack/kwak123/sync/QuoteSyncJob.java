@@ -12,13 +12,16 @@ import android.widget.Toast;
 
 import com.retroquack.kwak123.data.Contract;
 import com.retroquack.kwak123.data.PrefUtils;
+import com.retroquack.kwak123.util.Utility;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,6 +31,10 @@ import yahoofinance.YahooFinance;
 import yahoofinance.histquotes.HistoricalQuote;
 import yahoofinance.histquotes.Interval;
 import yahoofinance.quotes.stock.StockQuote;
+
+/**
+ * Code clean-up
+ */
 
 public final class QuoteSyncJob {
 
@@ -111,8 +118,10 @@ public final class QuoteSyncJob {
                 quoteCV.put(Contract.Quote.COLUMN_HISTORY, historyBuilder.toString());
 
                 quoteCVs.add(quoteCV);
-
             }
+
+            DateFormat format = DateFormat.getDateInstance(DateFormat.SHORT);
+            PrefUtils.setLastUpdate(context, format.format(Calendar.getInstance().getTimeInMillis()));
 
             context.getContentResolver()
                     .bulkInsert(
@@ -130,14 +139,11 @@ public final class QuoteSyncJob {
     private static void schedulePeriodic(Context context) {
         Timber.d("Scheduling a periodic task");
 
-
         JobInfo.Builder builder = new JobInfo.Builder(PERIODIC_ID, new ComponentName(context, QuoteJobService.class));
-
 
         builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .setPeriodic(PERIOD)
                 .setBackoffCriteria(INITIAL_BACKOFF, JobInfo.BACKOFF_POLICY_EXPONENTIAL);
-
 
         JobScheduler scheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
 
@@ -146,10 +152,8 @@ public final class QuoteSyncJob {
 
 
     public static synchronized void initialize(final Context context) {
-
         schedulePeriodic(context);
         syncImmediately(context);
-
     }
 
     public static synchronized void syncImmediately(Context context) {
@@ -164,15 +168,12 @@ public final class QuoteSyncJob {
 
             JobInfo.Builder builder = new JobInfo.Builder(ONE_OFF_ID, new ComponentName(context, QuoteJobService.class));
 
-
             builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                     .setBackoffCriteria(INITIAL_BACKOFF, JobInfo.BACKOFF_POLICY_EXPONENTIAL);
-
 
             JobScheduler scheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
 
             scheduler.schedule(builder.build());
-
 
         }
     }

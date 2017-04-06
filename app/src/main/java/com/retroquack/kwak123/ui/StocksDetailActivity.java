@@ -3,32 +3,34 @@ package com.retroquack.kwak123.ui;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
+import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.retroquack.kwak123.R;
 import com.retroquack.kwak123.data.Contract;
-import com.retroquack.kwak123.util.DateFormatter;
-import com.retroquack.kwak123.util.EntryComparator;
+import com.retroquack.kwak123.util.Utility;
 
 import java.io.IOException;
-import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import au.com.bytecode.opencsv.CSVParser;
@@ -41,24 +43,40 @@ public class StocksDetailActivity extends AppCompatActivity implements
 
     public static final String KEY_STOCK_SYMBOL = "stock_symbol";
 
+    @BindView(R.id.detail_app_bar) AppBarLayout appBarLayout;
+    @BindView(R.id.detail_collapsing_toolbar_layout) CollapsingToolbarLayout collapsingToolbarLayout;
+    @BindView(R.id.detail_toolbar) Toolbar toolbarView;
+    @BindView(R.id.detail_scroll_view)
+    NestedScrollView scrollView;
     @BindView(R.id.stock_name) TextView nameTextView;
     @BindView(R.id.stock_current) TextView currentTextView;
-    @BindView(R.id.stock_change_percent) TextView percentTextView;
+    @BindView(R.id.stock_change) TextView changeTextView;
     @BindView(R.id.stock_history) LineChart historyLineChart;
 
     private String symbol;
+    private DecimalFormat dollarFormat;
+    private DecimalFormat dollarFormatWithPlus;
+    private DecimalFormat percentFormat;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        symbol = getIntent().getStringExtra(KEY_STOCK_SYMBOL);
 
         setContentView(R.layout.activity_detail);
         ButterKnife.bind(this);
 
-        symbol = getIntent().getStringExtra(KEY_STOCK_SYMBOL);
+        collapsingToolbarLayout.setOnClickListener(expandListener);
+        toolbarView.setOnClickListener(expandListener);
 
+        setSupportActionBar(toolbarView);
         getSupportActionBar().setTitle(symbol);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         customizeChart();
+
+        dollarFormat = Utility.getDollarFormat();
+        dollarFormatWithPlus = Utility.getDollarFormatWithPlus();
+        percentFormat = Utility.getPercentageFormat();
 
         getSupportLoaderManager().initLoader(0, null, this);
     }
@@ -76,7 +94,7 @@ public class StocksDetailActivity extends AppCompatActivity implements
         XAxis xAxis = historyLineChart.getXAxis();
         YAxis yAxis = historyLineChart.getAxisLeft();
 
-        xAxis.setValueFormatter(DateFormatter.getInstance());
+        xAxis.setValueFormatter(Utility.getDateFormatter());
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setLabelCount(prefValueCount);
 
@@ -103,8 +121,22 @@ public class StocksDetailActivity extends AppCompatActivity implements
     private void updateUI(Cursor cursor){
         if (cursor != null) {
             nameTextView.setText(cursor.getString(Contract.Quote.POSITION_NAME));
-            currentTextView.setText(cursor.getString(Contract.Quote.POSITION_PRICE));
-            percentTextView.setText(cursor.getString(Contract.Quote.POSITION_PERCENTAGE_CHANGE));
+
+            float absoluteChange = cursor.getFloat(Contract.Quote.POSITION_ABSOLUTE_CHANGE);
+            float percentChange = cursor.getFloat(Contract.Quote.POSITION_PERCENTAGE_CHANGE);
+
+            if (absoluteChange > 0) {
+                changeTextView.setBackgroundResource(R.drawable.percent_change_pill_green);
+            } else {
+                changeTextView.setBackgroundResource(R.drawable.percent_change_pill_red);
+            }
+
+            String absChange = dollarFormatWithPlus.format(absoluteChange);
+            String perChange = percentFormat.format(percentChange/ 100);
+
+            currentTextView.setText(dollarFormat.format(cursor
+                    .getFloat(Contract.Quote.POSITION_PRICE)));
+            changeTextView.setText(absChange + " (" + perChange + ")");
             historyLineChart.setData(addData(cursor));
             historyLineChart.invalidate();
         } else {
@@ -116,17 +148,18 @@ public class StocksDetailActivity extends AppCompatActivity implements
         String historyRaw = cursor.getString(Contract.Quote.POSITION_HISTORY);
         CSVParser parser = new CSVParser();
         List<Entry> entries = new ArrayList<>();
+
         try {
             String[] strings = parser.parseLine(historyRaw);
             entries = parseStringsToEntries(strings);
-            Collections.sort(entries, EntryComparator.getInstance());
+            Collections.sort(entries, Utility.getEntryComparator());
         } catch (IOException ex) {
             Timber.w("Trouble parsing history");
             ex.printStackTrace();
         }
 
         LineDataSet data = new LineDataSet(entries, "label");
-
+        data.setDrawValues(false);
         return new LineData(data);
     }
 
@@ -149,11 +182,23 @@ public class StocksDetailActivity extends AppCompatActivity implements
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        data.moveToFirst();
-        updateUI(data);
+        if (data != null && data.getCount() > 0) {
+            data.moveToFirst();
+            updateUI(data);
+        }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {}
 
+    private View.OnClickListener expandListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (appBarLayout.getTop() == 0) {
+                appBarLayout.setExpanded(false);
+            } else {
+                appBarLayout.setExpanded(true);
+            }
+        }
+    };
 }

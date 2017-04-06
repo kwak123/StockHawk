@@ -4,18 +4,8 @@ import com.github.mikephil.charting.data.Entry;
 
 import java.util.Comparator;
 
-public final class EntryComparator implements Comparator<Entry> {
-
-    private static EntryComparator entryComparator;
-
-    private EntryComparator(){}
-
-    public static EntryComparator getInstance() {
-        if (entryComparator == null) {
-            entryComparator = new EntryComparator();
-        }
-        return entryComparator;
-    }
+final class EntryComparator implements Comparator<Entry> {
+    EntryComparator(){}
 
     @Override
     public int compare(Entry o1, Entry o2) {

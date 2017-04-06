@@ -54,9 +54,9 @@ dependencies {
     testCompile 'junit:junit:4.12'
 
     // Material Design
-    compile 'com.android.support:appcompat-v7:25.1.0'
-    compile 'com.android.support:recyclerview-v7:25.1.0'
-    compile 'com.android.support:design:25.1.0'
+    compile 'com.android.support:appcompat-v7:25.3.0'
+    compile 'com.android.support:recyclerview-v7:25.3.0'
+    compile 'com.android.support:design:25.3.0'
 
     // ButterKnife
     compile 'com.jakewharton:butterknife:8.4.0'
