@@ -1,8 +1,12 @@
 package com.retroquack.kwak123.util;
 
+import android.net.ConnectivityManager;
+
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
+
+import au.com.bytecode.opencsv.CSVParser;
 
 /**
  * Utilities for StockHawk, exposes all helper methods and classes for use throughout app
@@ -15,6 +19,7 @@ public final class Utility {
     private static DecimalFormat dFormatWithPlus;
     private static DecimalFormat pFormat;
     private static DateFormatter dateFormatter;
+    private static CSVParser parser;
 
     private static EntryComparator entryComparator;
 
@@ -56,4 +61,12 @@ public final class Utility {
         }
         return entryComparator;
     }
+
+    public static CSVParser getParser() {
+        if (parser == null) {
+            parser = new CSVParser();
+        }
+        return parser;
+    }
+
 }

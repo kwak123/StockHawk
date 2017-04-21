@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="?attr/actionBarSize"
+    android:paddingStart="32dp"
+    android:paddingEnd="32dp">
 
     <TextView
         android:id="@+id/stock_name"
@@ -9,23 +13,28 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <TextView
+        style="@style/StockCurrentTextStyle"
+        android:id="@+id/stock_current"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_below="@id/stock_name"/>
 
-        <TextView
-            style="@style/StockCurrentTextStyle"
-            android:id="@+id/stock_current"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"/>
+    <TextView
+        android:id="@+id/stock_change"
+        style="@style/BidPriceTextStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignBottom="@id/stock_current"
+        android:paddingBottom="8dp"/>
 
-        <TextView
-            android:id="@+id/stock_change"
-            style="@style/BidPriceTextStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+    <TextView
+        style="@style/LastUpdateStyle"
+        android:id="@+id/detail_last_update_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/stock_current"
+        android:layout_marginBottom="8dp"/>
 
-    </LinearLayout>
-
-</merge>
+</RelativeLayout>

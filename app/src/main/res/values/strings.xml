@@ -32,6 +32,7 @@
 
     <string name="error_no_network_no_stocks">We seem to be having trouble connecting to the server. When your network status returns, press the + sign and add some stocks!</string>
     <string name="error_no_network">No network, swipe down to refresh</string>
+    <string name="error_no_refresh">Unable to refresh stocks</string>
     <string name="error_no_stocks">Hit the floating action button to add a stock.</string>
 
     <string name="toast_stock_added_no_connectivity">Symbol %s added. Will refresh when network available.</string>

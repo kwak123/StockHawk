@@ -53,6 +53,7 @@ public class StocksMainActivity extends AppCompatActivity implements LoaderManag
 
     private StockAdapter adapter;
     private Snackbar snackbar;
+    private ConnectivityManager cm;
 
     @Override
     public void onClick(String symbol) {
@@ -68,16 +69,17 @@ public class StocksMainActivity extends AppCompatActivity implements LoaderManag
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        cm = (ConnectivityManager) getApplicationContext()
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
         setSupportActionBar(toolbar);
 
-
         adapter = new StockAdapter(this, this);
         stockRecyclerView.setAdapter(adapter);
         stockRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        String lastUpdate = getString(R.string.updated_last) + PrefUtils.getLastUpdate(this);
 
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.setRefreshing(true);
@@ -108,8 +110,6 @@ public class StocksMainActivity extends AppCompatActivity implements LoaderManag
     }
 
     private boolean networkUp() {
-        ConnectivityManager cm =
-                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = cm.getActiveNetworkInfo();
         return networkInfo != null && networkInfo.isConnectedOrConnecting();
     }
@@ -132,7 +132,6 @@ public class StocksMainActivity extends AppCompatActivity implements LoaderManag
             snackbar.dismiss();
 
             if (networkUp() && adapter.getItemCount() == 0) {
-
                 error.setText(getString(R.string.error_no_stocks));
                 error.setVisibility(View.VISIBLE);
             }

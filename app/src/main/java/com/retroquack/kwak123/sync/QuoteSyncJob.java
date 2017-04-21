@@ -10,9 +10,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.widget.Toast;
 
+import com.retroquack.kwak123.R;
 import com.retroquack.kwak123.data.Contract;
 import com.retroquack.kwak123.data.PrefUtils;
-import com.retroquack.kwak123.util.Utility;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -21,7 +21,6 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,10 +30,6 @@ import yahoofinance.YahooFinance;
 import yahoofinance.histquotes.HistoricalQuote;
 import yahoofinance.histquotes.Interval;
 import yahoofinance.quotes.stock.StockQuote;
-
-/**
- * Code clean-up
- */
 
 public final class QuoteSyncJob {
 
@@ -106,7 +101,9 @@ public final class QuoteSyncJob {
                 }
 
                 // Excise last comma
-                historyBuilder.delete(historyBuilder.length() - 2, historyBuilder.length());
+                if (historyBuilder.length() > 2) {
+                    historyBuilder.delete(historyBuilder.length() - 2, historyBuilder.length());
+                }
 
                 ContentValues quoteCV = new ContentValues();
                 quoteCV.put(Contract.Quote.COLUMN_SYMBOL, symbol);
@@ -133,6 +130,7 @@ public final class QuoteSyncJob {
 
         } catch (IOException exception) {
             Timber.e(exception, "Error fetching stock quotes");
+            Toast.makeText(context, context.getString(R.string.error_no_refresh), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -150,14 +148,12 @@ public final class QuoteSyncJob {
         scheduler.schedule(builder.build());
     }
 
-
     public static synchronized void initialize(final Context context) {
         schedulePeriodic(context);
         syncImmediately(context);
     }
 
     public static synchronized void syncImmediately(Context context) {
-
         ConnectivityManager cm =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = cm.getActiveNetworkInfo();
@@ -174,7 +170,6 @@ public final class QuoteSyncJob {
             JobScheduler scheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
 
             scheduler.schedule(builder.build());
-
         }
     }
 
