@@ -1,6 +1,7 @@
 package com.retroquack.kwak123.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -14,6 +15,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,6 +37,8 @@ public class StocksMainActivity extends AppCompatActivity implements LoaderManag
         StockAdapter.StockAdapterOnClickHandler {
 
     private static final int STOCK_LOADER = 0;
+    @BindView(R.id.main_toolbar)
+    Toolbar toolbar;
     @SuppressWarnings("WeakerAccess")
     @BindView(R.id.coordinator_layout)
     CoordinatorLayout coordinatorLayout;
@@ -46,11 +50,18 @@ public class StocksMainActivity extends AppCompatActivity implements LoaderManag
     @SuppressWarnings("WeakerAccess")
     @BindView(R.id.error)
     TextView error;
+
     private StockAdapter adapter;
     private Snackbar snackbar;
+    private ConnectivityManager cm;
 
     @Override
     public void onClick(String symbol) {
+        // For symbol to show on list, it must be in database i.e. not null
+        Intent intent = new Intent(this, StocksDetailActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(StocksDetailActivity.KEY_STOCK_SYMBOL, symbol);
+        startActivity(intent);
         Timber.d("Symbol clicked: %s", symbol);
     }
 
@@ -58,8 +69,13 @@ public class StocksMainActivity extends AppCompatActivity implements LoaderManag
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        cm = (ConnectivityManager) getApplicationContext()
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        setSupportActionBar(toolbar);
 
         adapter = new StockAdapter(this, this);
         stockRecyclerView.setAdapter(adapter);
@@ -70,6 +86,7 @@ public class StocksMainActivity extends AppCompatActivity implements LoaderManag
         snackbar = Snackbar.make(coordinatorLayout,
                 getString(R.string.error_no_network),
                 Snackbar.LENGTH_INDEFINITE);
+
         onRefresh();
 
         QuoteSyncJob.initialize(this);
@@ -93,8 +110,6 @@ public class StocksMainActivity extends AppCompatActivity implements LoaderManag
     }
 
     private boolean networkUp() {
-        ConnectivityManager cm =
-                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = cm.getActiveNetworkInfo();
         return networkInfo != null && networkInfo.isConnectedOrConnecting();
     }
@@ -117,7 +132,6 @@ public class StocksMainActivity extends AppCompatActivity implements LoaderManag
             snackbar.dismiss();
 
             if (networkUp() && adapter.getItemCount() == 0) {
-
                 error.setText(getString(R.string.error_no_stocks));
                 error.setVisibility(View.VISIBLE);
             }

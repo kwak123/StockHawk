@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="?attr/actionBarSize"
+    android:paddingStart="32dp"
+    android:paddingEnd="32dp">
+
+    <TextView
+        android:id="@+id/stock_name"
+        style="@style/StockNameTextStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        style="@style/StockCurrentTextStyle"
+        android:id="@+id/stock_current"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/stock_name"/>
+
+    <TextView
+        android:id="@+id/stock_change"
+        style="@style/BidPriceTextStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignBottom="@id/stock_current"
+        android:paddingBottom="8dp"/>
+
+    <TextView
+        style="@style/LastUpdateStyle"
+        android:id="@+id/detail_last_update_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/stock_current"
+        android:layout_marginBottom="8dp"/>
+
+</RelativeLayout>

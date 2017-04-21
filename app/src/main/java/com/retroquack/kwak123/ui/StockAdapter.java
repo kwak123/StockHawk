@@ -12,15 +12,17 @@ import android.widget.TextView;
 import com.retroquack.kwak123.R;
 import com.retroquack.kwak123.data.Contract;
 import com.retroquack.kwak123.data.PrefUtils;
+import com.retroquack.kwak123.util.Utility;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
+class StockAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private final Context context;
     private final DecimalFormat dollarFormatWithPlus;
@@ -29,17 +31,15 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
     private Cursor cursor;
     private final StockAdapterOnClickHandler clickHandler;
 
+    private static final int FOOTER = 1;
+
     StockAdapter(Context context, StockAdapterOnClickHandler clickHandler) {
         this.context = context;
         this.clickHandler = clickHandler;
 
-        dollarFormat = (DecimalFormat) NumberFormat.getCurrencyInstance(Locale.US);
-        dollarFormatWithPlus = (DecimalFormat) NumberFormat.getCurrencyInstance(Locale.US);
-        dollarFormatWithPlus.setPositivePrefix("+$");
-        percentageFormat = (DecimalFormat) NumberFormat.getPercentInstance(Locale.getDefault());
-        percentageFormat.setMaximumFractionDigits(2);
-        percentageFormat.setMinimumFractionDigits(2);
-        percentageFormat.setPositivePrefix("+");
+        dollarFormat = Utility.getDollarFormat();
+        dollarFormatWithPlus = Utility.getDollarFormatWithPlus();
+        percentageFormat = Utility.getPercentageFormat();
     }
 
     void setCursor(Cursor cursor) {
@@ -54,42 +54,51 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
     }
 
     @Override
-    public StockViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        View item = LayoutInflater.from(context).inflate(R.layout.list_item_quote, parent, false);
-
+        View item;
+        if (viewType == FOOTER) {
+            item = LayoutInflater.from(context).inflate(R.layout.list_item_footer, parent, false);
+            return new FooterViewHolder(item);
+        }
+        item = LayoutInflater.from(context).inflate(R.layout.list_item_quote, parent, false);
         return new StockViewHolder(item);
     }
 
     @Override
-    public void onBindViewHolder(StockViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
-        cursor.moveToPosition(position);
-
-
-        holder.symbol.setText(cursor.getString(Contract.Quote.POSITION_SYMBOL));
-        holder.price.setText(dollarFormat.format(cursor.getFloat(Contract.Quote.POSITION_PRICE)));
-
-
-        float rawAbsoluteChange = cursor.getFloat(Contract.Quote.POSITION_ABSOLUTE_CHANGE);
-        float percentageChange = cursor.getFloat(Contract.Quote.POSITION_PERCENTAGE_CHANGE);
-
-        if (rawAbsoluteChange > 0) {
-            holder.change.setBackgroundResource(R.drawable.percent_change_pill_green);
+        if (holder instanceof FooterViewHolder) {
+            FooterViewHolder footerViewHolder = (FooterViewHolder) holder;
+            String lastUpdate = context.getString(R.string.updated_last) + PrefUtils.getLastUpdate(context);
+            footerViewHolder.lastUpdate.setText(lastUpdate);
         } else {
-            holder.change.setBackgroundResource(R.drawable.percent_change_pill_red);
+            StockViewHolder stockViewHolder = (StockViewHolder) holder;
+            cursor.moveToPosition(position);
+
+            stockViewHolder.symbol.setText(cursor.getString(Contract.Quote.POSITION_SYMBOL));
+            stockViewHolder.price.setText(dollarFormat.format(cursor.getFloat(Contract.Quote.POSITION_PRICE)));
+
+
+            float rawAbsoluteChange = cursor.getFloat(Contract.Quote.POSITION_ABSOLUTE_CHANGE);
+            float percentageChange = cursor.getFloat(Contract.Quote.POSITION_PERCENTAGE_CHANGE);
+
+            if (rawAbsoluteChange > 0) {
+                stockViewHolder.change.setBackgroundResource(R.drawable.percent_change_pill_green);
+            } else {
+                stockViewHolder.change.setBackgroundResource(R.drawable.percent_change_pill_red);
+            }
+
+            String change = dollarFormatWithPlus.format(rawAbsoluteChange);
+            String percentage = percentageFormat.format(percentageChange / 100);
+
+            if (PrefUtils.getDisplayMode(context)
+                    .equals(context.getString(R.string.pref_display_mode_absolute_key))) {
+                stockViewHolder.change.setText(change);
+            } else {
+                stockViewHolder.change.setText(percentage);
+            }
         }
-
-        String change = dollarFormatWithPlus.format(rawAbsoluteChange);
-        String percentage = percentageFormat.format(percentageChange / 100);
-
-        if (PrefUtils.getDisplayMode(context)
-                .equals(context.getString(R.string.pref_display_mode_absolute_key))) {
-            holder.change.setText(change);
-        } else {
-            holder.change.setText(percentage);
-        }
-
 
     }
 
@@ -97,11 +106,19 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
     public int getItemCount() {
         int count = 0;
         if (cursor != null) {
-            count = cursor.getCount();
+            count = cursor.getCount() + 1;
         }
         return count;
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        if (position < cursor.getCount()) {
+            return super.getItemViewType(position);
+        } else {
+            return FOOTER;
+        }
+    }
 
     interface StockAdapterOnClickHandler {
         void onClick(String symbol);
@@ -134,5 +151,14 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
         }
 
 
+    }
+
+    class FooterViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.last_update_view) TextView lastUpdate;
+
+        FooterViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
     }
 }
