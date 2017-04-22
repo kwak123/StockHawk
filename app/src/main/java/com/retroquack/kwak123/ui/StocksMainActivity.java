@@ -105,8 +105,6 @@ public class StocksMainActivity extends AppCompatActivity implements LoaderManag
                 getContentResolver().delete(Contract.Quote.makeUriForStock(symbol), null, null);
             }
         }).attachToRecyclerView(stockRecyclerView);
-
-
     }
 
     private boolean networkUp() {
@@ -144,7 +142,6 @@ public class StocksMainActivity extends AppCompatActivity implements LoaderManag
 
     void addStock(String symbol) {
         if (symbol != null && !symbol.isEmpty()) {
-
             if (networkUp()) {
                 swipeRefreshLayout.setRefreshing(true);
             } else {
@@ -213,4 +210,3 @@ public class StocksMainActivity extends AppCompatActivity implements LoaderManag
         return super.onOptionsItemSelected(item);
     }
 }
-
