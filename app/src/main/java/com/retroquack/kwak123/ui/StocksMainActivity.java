@@ -31,10 +31,6 @@ import com.retroquack.kwak123.sync.QuoteSyncJob;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import timber.log.Timber;
-import yahoofinance.Stock;
-import yahoofinance.YahooFinance;
-
-import static android.R.attr.data;
 
 public class StocksMainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
         SwipeRefreshLayout.OnRefreshListener,
@@ -109,8 +105,6 @@ public class StocksMainActivity extends AppCompatActivity implements LoaderManag
                 getContentResolver().delete(Contract.Quote.makeUriForStock(symbol), null, null);
             }
         }).attachToRecyclerView(stockRecyclerView);
-
-
     }
 
     private boolean networkUp() {
@@ -216,4 +210,3 @@ public class StocksMainActivity extends AppCompatActivity implements LoaderManag
         return super.onOptionsItemSelected(item);
     }
 }
-

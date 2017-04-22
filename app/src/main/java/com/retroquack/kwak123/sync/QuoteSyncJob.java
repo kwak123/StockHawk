@@ -10,13 +10,11 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.design.widget.Snackbar;
 import android.widget.Toast;
 
 import com.retroquack.kwak123.R;
 import com.retroquack.kwak123.data.Contract;
 import com.retroquack.kwak123.data.PrefUtils;
-import com.retroquack.kwak123.ui.StocksMainActivity;
 
 import java.io.IOException;
 import java.text.DateFormat;
