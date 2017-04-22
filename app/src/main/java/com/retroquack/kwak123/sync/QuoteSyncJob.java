@@ -8,11 +8,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Handler;
+import android.os.Looper;
+import android.support.design.widget.Snackbar;
 import android.widget.Toast;
 
 import com.retroquack.kwak123.R;
 import com.retroquack.kwak123.data.Contract;
 import com.retroquack.kwak123.data.PrefUtils;
+import com.retroquack.kwak123.ui.StocksMainActivity;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -39,6 +43,7 @@ public final class QuoteSyncJob {
     private static final int INITIAL_BACKOFF = 10000;
     private static final int PERIODIC_ID = 1;
     private static final int YEARS_OF_HISTORY = 1;
+    private static Handler handler = new Handler(Looper.getMainLooper());
 
     private QuoteSyncJob() {
     }
@@ -52,7 +57,6 @@ public final class QuoteSyncJob {
         from.add(Calendar.YEAR, -YEARS_OF_HISTORY);
 
         try {
-
             Set<String> stockPref = PrefUtils.getStocks(context);
             Set<String> stockCopy = new HashSet<>();
             stockCopy.addAll(stockPref);
@@ -77,9 +81,10 @@ public final class QuoteSyncJob {
                 Stock stock = quotes.get(symbol);
                 StockQuote quote = stock.getQuote();
 
-                if (quote == null) {
-                    Toast.makeText(context, symbol + " is not a valid quote",
-                            Toast.LENGTH_SHORT).show();
+                if (stock.getName() == null) {
+                    handleError(context, symbol);
+                    PrefUtils.removeStock(context, symbol);
+                    continue;
                 }
 
                 String name = stock.getName();
@@ -173,5 +178,15 @@ public final class QuoteSyncJob {
         }
     }
 
+    private static void handleError(Context context, String symbol) {
+        final Context context1 = context;
+        final String symbol1 = symbol;
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(context1, symbol1 + " is not a valid symbol.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
 }
